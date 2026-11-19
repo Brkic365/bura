@@ -8,7 +8,7 @@ import { bilinear } from '../shared/interp';
 import { buildLandMask, isLandAt } from '../shared/landmask';
 import type { Bundle } from '../shared/types';
 import { fromUV } from '../shared/wind';
-import { decodeXmlBytes, parseDhmzXml } from '../server/dhmz';
+import { decodeXmlBytes, isExcludedStation, parseDhmzXml } from '../server/dhmz';
 import { runIngest } from '../server/ingest';
 import { assembleSeries, buildUrl, sampleNodes } from '../server/openmeteo';
 import type { Storage } from '../server/storage';
@@ -33,6 +33,12 @@ describe('DHMZ parser', () => {
   it('decodes windows-1250 feeds using the XML prolog', () => {
     const bytes = new Uint8Array([...new TextEncoder().encode('<?xml version="1.0" encoding="windows-1250"?><a>'), 0x9e, ...new TextEncoder().encode('</a>')]);
     expect(decodeXmlBytes(bytes)).toContain('<a>ž</a>');
+  });
+
+  it('excludes mountain stations even with DHMZ name prefixes', () => {
+    expect(isExcludedStation('RC Puntijarka')).toBe(true);
+    expect(isExcludedStation('Zavižan')).toBe(true);
+    expect(isExcludedStation('Split-Marjan')).toBe(false);
   });
 
   it('rejects documents without the expected root', () => {

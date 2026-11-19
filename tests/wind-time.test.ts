@@ -74,6 +74,12 @@ describe('classifyRegime', () => {
   it('detects jugo', () => expect(classifyRegime(pts(135, 10)).regime).toBe('jugo'));
   it('detects maestral', () => expect(classifyRegime(pts(305, 6)).regime).toBe('maestral'));
   it('detects tramontana', () => expect(classifyRegime(pts(5, 9)).regime).toBe('tramontana'));
+  it('names the rest of the rose', () => {
+    expect(classifyRegime(pts(95, 9)).regime).toBe('levant');
+    expect(classifyRegime(pts(185, 9)).regime).toBe('ostro');
+    expect(classifyRegime(pts(225, 9)).regime).toBe('lebic');
+    expect(classifyRegime(pts(270, 9)).regime).toBe('pulenat');
+  });
   it('calls light winds calm', () => expect(classifyRegime(pts(50, 1.5, 0)).regime).toBe('calm'));
   it('calls disagreeing directions variable', () => {
     const mixed = [...pts(45, 8).slice(0, 5), ...pts(225, 8).slice(0, 5)];

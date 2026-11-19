@@ -67,7 +67,7 @@ class App {
   tier = coarse || small ? 3 : 1;
   /** `?n=65536` pins the particle count and turns off adaptive quality (handy for screenshots). */
   pinned = Number(new URLSearchParams(location.search).get('n')) || 0;
-  perf = { acc: 0, n: 0, since: 0 };
+  perf = { acc: 0, n: 0, since: 0, strikes: 0 };
   last = performance.now();
 
   async start() {
@@ -221,11 +221,16 @@ class App {
   // ── Render loop ───────────────────────────────────────
   /** Minimum seconds between rendered frames (0 = every display frame). */
   frameInterval = 0;
+  throttled = false;
 
   loop(now: number) {
-    const dt = Math.min(0.1, (now - this.last) / 1000);
+    const raw = (now - this.last) / 1000;
+    const dt = Math.min(0.1, raw);
     if (dt >= this.frameInterval) {
       this.last = now;
+      // Background or throttled tabs deliver frames seconds apart: render them, but don't
+      // let them count as GPU slowness.
+      this.throttled = raw > 0.1 || document.visibilityState !== 'visible';
       this.tick(dt);
     }
     requestAnimationFrame((t) => this.loop(t));
@@ -280,7 +285,7 @@ class App {
 
   /** Drop to a lighter particle tier if the GPU can't hold ~45 fps. */
   adapt(dt: number) {
-    if (this.pinned) return;
+    if (this.pinned || this.throttled || this.frameInterval) return;
     const p = this.perf;
     p.since += dt;
     if (p.since < 2) return; // warm-up
@@ -290,7 +295,10 @@ class App {
       const avg = p.acc / p.n;
       p.acc = 0;
       p.n = 0;
-      if (avg > 1 / 45 && this.tier < PARTICLE_TIERS.length - 1 && !document.hidden) {
+      // Two slow windows in a row before stepping down, so one hitch doesn't cost quality.
+      p.strikes = avg > 1 / 40 ? p.strikes + 1 : 0;
+      if (p.strikes >= 2 && this.tier < PARTICLE_TIERS.length - 1) {
+        p.strikes = 0;
         this.tier++;
         this.gl!.setCount(PARTICLE_TIERS[this.tier]);
         console.info(`[bura] frame time ${(avg * 1000).toFixed(1)} ms → ${PARTICLE_TIERS[this.tier]} particles`);

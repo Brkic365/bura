@@ -91,7 +91,7 @@ Particle positions live in an RGBA8 texture, two bytes per axis, which gives 1/6
 | **Draw** | One `GL_LINES` segment per particle (old → new), generated from `gl_VertexID` with no vertex buffers. Colour comes from the speed ramp, generated into GLSL from the same stops as the legend. Segments are dimmed over land (rasterised land mask texture) and at the domain edge. |
 | **Blit** | Premultiplied alpha onto the canvas, over a static 2D-canvas basemap. |
 
-The CPU only sets a few uniforms per frame. The particle count adapts to the device: 32k on desktop and 8k on touch devices, dropping a tier if frame time stays above 22 ms. `?n=65536` pins it. Step size is defined in screen pixels per m/s, so motion looks the same at every zoom level and frame rate.
+The CPU only sets a few uniforms per frame. The particle count adapts to the device: 32k on desktop and 8k on touch devices, dropping a tier if frame time stays above 25 ms for two 1.5 s windows (background-throttled frames are ignored). `?n=65536` pins it. Step size is defined in screen pixels per m/s, so motion looks the same at every zoom level and frame rate.
 
 ### Regime label
 
@@ -99,7 +99,7 @@ The CPU only sets a few uniforms per frame. The particle count adapts to the dev
 
 - calm when the mean is under 3 m/s and no gust reaches 10 m/s
 - variable when steadiness is under 0.45
-- otherwise by sector: bura (20–100°), tramontana (350–20°), jugo (100–190°), lebić (190–260°), maestral (260–350°)
+- otherwise by sector on the traditional Adriatic wind rose: tramontana N, **bura** NE (20–80°), levant E, **jugo** SE (110–170°), oštro S, lebić SW, pulenat W, maestral NW
 
 The strongest gust is reported with the nearest place name.
 

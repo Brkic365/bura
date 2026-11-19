@@ -1,13 +1,16 @@
 import { fromUV } from './wind.js';
 
-export type RegimeId = 'bura' | 'jugo' | 'maestral' | 'tramontana' | 'lebic' | 'variable' | 'calm';
+export type RegimeId = 'bura' | 'levant' | 'jugo' | 'ostro' | 'lebic' | 'pulenat' | 'maestral' | 'tramontana' | 'variable' | 'calm';
 
 export const REGIME_LABEL: Record<RegimeId, { name: string; gloss: string }> = {
   bura: { name: 'Bura', gloss: 'cold, gusty fall wind' },
+  levant: { name: 'Levant', gloss: 'easterly' },
   jugo: { name: 'Jugo', gloss: 'warm, humid sea wind' },
-  maestral: { name: 'Maestral', gloss: 'summer sea breeze' },
-  tramontana: { name: 'Tramontana', gloss: 'cool northerly' },
+  ostro: { name: 'Oštro', gloss: 'southerly' },
   lebic: { name: 'Lebić', gloss: 'stormy south-westerly' },
+  pulenat: { name: 'Pulenat', gloss: 'westerly' },
+  maestral: { name: 'Maestral', gloss: 'north-westerly, fair weather' },
+  tramontana: { name: 'Tramontana', gloss: 'cool northerly' },
   variable: { name: 'Variable', gloss: 'no dominant direction' },
   calm: { name: 'Calm', gloss: 'light winds' },
 };
@@ -37,14 +40,13 @@ export interface RegimeSummary {
  *
  * - Calm: mean speed < 3 m/s and no gust ≥ 10 m/s.
  * - Variable: directions disagree (steadiness < 0.45).
- * - Otherwise by the resultant "from" direction:
- *     350–100° → bura when it is mostly NE (≥ 20°), tramontana when mostly N
- *     100–190° → jugo
- *     190–260° → lebić
- *     260–350° → maestral
+ * - Otherwise by the resultant "from" direction, on the traditional Adriatic wind rose:
+ *     tramontana N (340–20°) · bura NE (20–80°) · levant E (80–110°) · jugo SE (110–170°)
+ *     oštro S (170–200°) · lebić SW (200–245°) · pulenat W (245–290°) · maestral NW (290–340°)
  *
- * The sectors are broad on purpose. Bura is channelled through mountain gaps, so it
- * arrives as anything from NNE to ENE depending on where along the coast you stand.
+ * Bura and jugo get the widest sectors on purpose. Bura is channelled through mountain gaps,
+ * so it arrives as anything from NNE to ENE depending on where along the coast you stand.
+ * Jugo follows the coast's NW–SE axis.
  */
 export function classifyRegime(samples: RegimeSample[]): RegimeSummary {
   let su = 0;
@@ -66,9 +68,13 @@ export function classifyRegime(samples: RegimeSample[]): RegimeSummary {
   let regime: RegimeId;
   if (meanSpeed < 3 && gust.value < 10) regime = 'calm';
   else if (steadiness < 0.45) regime = 'variable';
-  else if (d >= 350 || d < 100) regime = d >= 20 && d < 100 ? 'bura' : 'tramontana';
-  else if (d < 190) regime = 'jugo';
-  else if (d < 260) regime = 'lebic';
+  else if (d >= 340 || d < 20) regime = 'tramontana';
+  else if (d < 80) regime = 'bura';
+  else if (d < 110) regime = 'levant';
+  else if (d < 170) regime = 'jugo';
+  else if (d < 200) regime = 'ostro';
+  else if (d < 245) regime = 'lebic';
+  else if (d < 290) regime = 'pulenat';
   else regime = 'maestral';
 
   return {

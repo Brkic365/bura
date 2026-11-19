@@ -28,7 +28,12 @@ export const DHMZ_URL = 'https://vrijeme.hr/hrvatska_n.xml';
  * Mountain-top stations. Their winds are real but don't represent the 10 m surface field over
  * the coast and sea, so they are left out of the correction.
  */
-const EXCLUDED = new Set(['Zavižan', 'Parg', 'Puntijarka', 'Sljeme', 'Bjelolasica', 'Mrkopalj', 'Učka', 'Vrh Učke']);
+const EXCLUDED = ['zavižan', 'parg', 'puntijarka', 'sljeme', 'bjelolasica', 'mrkopalj', 'učka'];
+/** DHMZ names carry prefixes like "RC " (regional centre) or "GMP ", so match loosely. */
+export const isExcludedStation = (name: string) => {
+  const n = name.toLowerCase();
+  return EXCLUDED.some((x) => n.includes(x));
+};
 
 const parser = new XMLParser({ ignoreAttributes: true, trimValues: true, parseTagValue: false, isArray: (name) => name === 'Grad' });
 
@@ -58,7 +63,7 @@ export function parseDhmzXml(xml: string): ObsSnapshot {
     const lon = num(g.Lon);
     const speed = num(g.Podatci?.VjetarBrzina);
     if (!name || lat === null || lon === null || speed === null || speed < 0 || speed > 70) continue;
-    if (EXCLUDED.has(name)) continue;
+    if (isExcludedStation(name)) continue;
     const dir = parseDirection(g.Podatci?.VjetarSmjer);
     if (dir.kind === 'unknown' && speed > 0) continue;
     stations.push({
