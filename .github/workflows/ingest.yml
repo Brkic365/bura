@@ -1,0 +1,39 @@
+# Vercel Hobby cron jobs run at most once a day, so this workflow is the 15-minute clock.
+# It only calls the deployed /api/ingest endpoint; all the logic stays in the app.
+#
+# Setup (repo → Settings → Secrets and variables → Actions):
+#   secret   CRON_SECRET  same value as the Vercel env var
+#   variable BURA_URL     e.g. https://bura.vercel.app
+name: ingest
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Refetch the model now'
+        type: boolean
+        default: false
+
+concurrency:
+  group: ingest
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Trigger ingest
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          BURA_URL: ${{ vars.BURA_URL }}
+          FORCE: ${{ inputs.force && '1' || '0' }}
+        run: |
+          if [ -z "$CRON_SECRET" ] || [ -z "$BURA_URL" ]; then
+            echo "::warning::CRON_SECRET secret or BURA_URL variable not set; skipping"; exit 0
+          fi
+          curl -fsS --retry 2 --retry-delay 10 --max-time 90 \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "$BURA_URL/api/ingest?force=$FORCE"

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Bura: live wind over the Croatian Adriatic</title>
+    <meta name="description" content="Live wind over the Croatian Adriatic coast as a GPU particle field. DHMZ station observations blended into Open-Meteo forecasts, so bura and jugo stand out at a glance." />
+    <meta name="theme-color" content="#040609" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href="/fonts/archivo-latin-standard-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <meta property="og:title" content="Bura: live Adriatic wind" />
+    <meta property="og:description" content="Thousands of particles flowing along the live wind field over the Croatian coast." />
+    <meta property="og:image" content="/og.jpg" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body>
+    <main id="app">
+      <canvas id="basemap" aria-hidden="true"></canvas>
+      <canvas id="particles" aria-hidden="true"></canvas>
+      <canvas id="overlay" role="img" aria-label="Animated map of wind over the Croatian Adriatic coast"></canvas>
+
+      <header class="hud">
+        <p class="eyebrow"><span class="pulse" aria-hidden="true"></span><span class="brand">Bura</span><span class="sep" aria-hidden="true">/</span><span id="mode">Adriatic wind</span></p>
+        <h1 id="regime">Adriatic wind</h1>
+        <p id="detail" class="detail" aria-live="polite">Loading the wind field…</p>
+      </header>
+
+      <nav class="tools" aria-label="Map options">
+        <button id="btn-stations" type="button" aria-pressed="true" aria-label="Stations" title="Toggle DHMZ station markers (S)">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3" /><path d="M8 1v3M8 12v3M1 8h3M12 8h3" /></svg>
+          <span>Stations</span>
+        </button>
+        <button id="btn-reset" type="button" aria-label="Reset view" title="Reset view (0)" hidden>
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 6V2h4M14 10v4h-4M2 2l4.5 4.5M14 14l-4.5-4.5" /></svg>
+          <span>Reset</span>
+        </button>
+        <button id="btn-about" type="button" aria-haspopup="dialog" aria-label="About">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" /><path d="M8 7v4.5M8 4.6v.1" /></svg>
+          <span>About</span>
+        </button>
+      </nav>
+
+      <aside class="legend" aria-label="Colour scale">
+        <div class="legend-bar" id="legend-bar"></div>
+        <div class="legend-ticks"><span>0</span><span>10</span><span>20</span><span>30 m/s</span></div>
+      </aside>
+
+      <footer class="timeline">
+        <button id="play" type="button" class="play" aria-label="Play through time">
+          <svg class="i-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" /></svg>
+          <svg class="i-pause" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5h3v11H4zM9 2.5h3v11H9z" /></svg>
+        </button>
+        <div class="track">
+          <canvas id="spark" aria-hidden="true"></canvas>
+          <input id="scrub" type="range" min="0" max="72" step="1" value="24" aria-label="Time" disabled />
+        </div>
+        <div class="time">
+          <output id="time-label" for="scrub">--</output>
+          <span id="time-kind" class="kind"></span>
+        </div>
+        <button id="live" type="button" class="live" hidden>Now</button>
+        <p class="credit">Data: <a href="https://meteo.hr" rel="noopener">DHMZ</a> · <a href="https://open-meteo.com" rel="noopener">Open-Meteo</a> (CC BY 4.0) · Natural Earth</p>
+      </footer>
+
+      <div id="tooltip" class="tooltip" role="status" hidden></div>
+
+      <dialog id="about" aria-labelledby="about-title">
+        <form method="dialog" class="about-close"><button aria-label="Close">×</button></form>
+        <h2 id="about-title">Bura</h2>
+        <p>Wind over the Croatian Adriatic, drawn as tens of thousands of particles flowing along the current wind field. Colour shows speed. The fading trails show direction.</p>
+        <h3>Reading it</h3>
+        <ul>
+          <li><strong>Bura</strong> (NE) comes down off the Velebit and Biokovo in narrow, gusty jets, strongest below Senj, Karlobag and Makarska.</li>
+          <li><strong>Jugo</strong> (SE) is a broad, steady flow along the length of the Adriatic, strongest in the open south.</li>
+          <li>Drag the timeline for the last 24 h and the next 48 h. Hover or tap the map for local wind. Scroll or pinch to zoom.</li>
+        </ul>
+        <h3>Data</h3>
+        <ul>
+          <li>Observations: <a href="https://meteo.hr/proizvodi.php?section=podaci&amp;param=xml_korisnici" rel="noopener">DHMZ</a> station reports (hourly), <a href="https://data.gov.hr/otvorena-dozvola" rel="noopener">Open Licence of the Republic of Croatia</a>.</li>
+          <li>Model: <a href="https://open-meteo.com" rel="noopener">Open-Meteo</a> 10 m wind and gusts (ICON and other national models), <a href="https://creativecommons.org/licenses/by/4.0/" rel="noopener">CC BY 4.0</a>.</li>
+          <li>Coastline: <a href="https://www.naturalearthdata.com" rel="noopener">Natural Earth</a>, public domain.</li>
+        </ul>
+        <p class="muted">Station reports are blended into the model by inverse-distance weighting of observed-minus-model wind vectors. Their influence fades with distance and, in the forecast, with lead time. This is a visualisation, not a navigational forecast. For safety at sea, use <a href="https://meteo.hr" rel="noopener">meteo.hr</a>.</p>
+        <h3>Demo scenarios</h3>
+        <p class="demos"><a href="?demo=bura">Bura</a><a href="?demo=jugo">Jugo</a><a href="?demo=maestral">Maestral</a><a href="./">Live</a></p>
+        <p class="muted">Built by <a href="https://antoniobrkic.com" rel="noopener">Antonio Brkić</a> · TypeScript + WebGL2.</p>
+      </dialog>
+
+      <noscript><p class="noscript">Bura needs JavaScript and WebGL to draw the wind field.</p></noscript>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

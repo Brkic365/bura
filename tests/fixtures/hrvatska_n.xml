@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Synthetic fixture in the documented shape of https://vrijeme.hr/hrvatska_n.xml (values invented). -->
+<Hrvatska>
+  <DatumTermin><Datum>19.11.2026</Datum><Termin>18</Termin></DatumTermin>
+  <Grad autom="0">
+    <GradIme>Senj</GradIme><Lat>44.993</Lat><Lon>14.903</Lon>
+    <Podatci><Temp>7.4</Temp><Vlaga>41</Vlaga><Tlak>1021.3</Tlak><TlakTend>+0.4</TlakTend><VjetarSmjer>NE</VjetarSmjer><VjetarBrzina>17.2</VjetarBrzina><Vrijeme>vedro</Vrijeme><VrijemeZnak>1</VrijemeZnak></Podatci>
+  </Grad>
+  <Grad autom="0">
+    <GradIme>Split-Marjan</GradIme><Lat>43.508</Lat><Lon>16.426</Lon>
+    <Podatci><Temp>11.0</Temp><Vlaga>38</Vlaga><Tlak>1019.8</Tlak><TlakTend>+0.2</TlakTend><VjetarSmjer>NNE</VjetarSmjer><VjetarBrzina>9.8</VjetarBrzina><Vrijeme>vedro</Vrijeme><VrijemeZnak>1</VrijemeZnak></Podatci>
+  </Grad>
+  <Grad autom="1">
+    <GradIme>Dubrovnik</GradIme><Lat>42.645</Lat><Lon>18.085</Lon>
+    <Podatci><Temp>13.2</Temp><Vlaga>45</Vlaga><Tlak>1018.1</Tlak><TlakTend>-0.1</TlakTend><VjetarSmjer>C</VjetarSmjer><VjetarBrzina>0.0</VjetarBrzina><Vrijeme>vedro</Vrijeme><VrijemeZnak>1</VrijemeZnak></Podatci>
+  </Grad>
+  <Grad autom="0">
+    <GradIme>Zavižan</GradIme><Lat>44.815</Lat><Lon>14.975</Lon>
+    <Podatci><Temp>-3.1</Temp><Vlaga>80</Vlaga><Tlak>837.0*</Tlak><TlakTend>-</TlakTend><VjetarSmjer>NE</VjetarSmjer><VjetarBrzina>24.0</VjetarBrzina><Vrijeme>magla</Vrijeme><VrijemeZnak>16</VrijemeZnak></Podatci>
+  </Grad>
+  <Grad autom="0">
+    <GradIme>Zadar</GradIme><Lat>44.130</Lat><Lon>15.206</Lon>
+    <Podatci><Temp>10.1</Temp><Vlaga>-</Vlaga><Tlak>1020.4</Tlak><TlakTend>-</TlakTend><VjetarSmjer>-</VjetarSmjer><VjetarBrzina>-</VjetarBrzina><Vrijeme>-</Vrijeme><VrijemeZnak>-</VrijemeZnak></Podatci>
+  </Grad>
+  <Grad autom="0">
+    <GradIme>Zagreb-Maksimir</GradIme><Lat>45.822</Lat><Lon>16.034</Lon>
+    <Podatci><Temp>4.2</Temp><Vlaga>70</Vlaga><Tlak>1022.0</Tlak><TlakTend>+0.6</TlakTend><VjetarSmjer>ENE</VjetarSmjer><VjetarBrzina>3.1</VjetarBrzina><Vrijeme>oblačno</Vrijeme><VrijemeZnak>4</VrijemeZnak></Podatci>
+  </Grad>
+</Hrvatska>
